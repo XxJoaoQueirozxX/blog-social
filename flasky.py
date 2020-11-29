@@ -21,7 +21,7 @@ def make_shell_context():
     return dict(db=db, User=User, Role=Role)
 
 
-@app.cli.command1
+@app.cli.command
 def test():
     """ Run the unit tests. """
     import unittest
