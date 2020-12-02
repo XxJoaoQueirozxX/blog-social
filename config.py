@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") or 'hard to guess string'
     MAIL_SERVER = os.getenv("MAIL_SERVER", "smtp.googlemail.com")
@@ -9,7 +12,7 @@ class Config:
     MAIL_USERNAME = os.getenv("USER_EMAIL")
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <hotel.api.teste@gmail.com>'
+    FLASKY_MAIL_SENDER = 'Flasky Admin <hotel.api.flask@gmail.com>'
     FLASKY_ADMIN = os.getenv("FLASK_ADMIN")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
