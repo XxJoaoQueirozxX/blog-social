@@ -6,6 +6,7 @@ from . import main
 from ..models import User, db, Role
 from .forms import EditProfileForm, EditProfileAdminForm
 
+
 @main.route('/', methods=["GET", "POST"])
 def index():
     return render_template("index.html", current_time=datetime.utcnow())

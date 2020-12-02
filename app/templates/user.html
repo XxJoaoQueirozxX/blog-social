@@ -7,7 +7,9 @@
 
 {% block page_content %}
 
-    <div class="page-header">
+    <img src="{{ user.gravatar(size=256) }}" alt="" class="img-rounded profile-thumbnail">
+    
+    <div class="profile-header">
         <h1>{{ user.username }}</h1>
         {% if user.name or user.location %}
             <p>
@@ -33,13 +35,13 @@
             Member since {{ moment(user.member_since).format('L') }}
             Last seen {{ moment(user.last_seen).fromNow() }}
         </p>
+        {% if user == current_user %}
+            <a href="{{ url_for('.edit_profile') }}" class="btn btn-default">Edit Profile</a>
+        {% endif %}
+        {% if current_user.is_administrator() %}
+            <a href="{{ url_for('.admin_edit_profile', id=user.id) }}" class="btn btn-danger">
+                Edit Profile [Admin]
+            </a>
+        {% endif %}
     </div>
-    {% if user == current_user %}
-        <a href="{{ url_for('.edit_profile') }}" class="btn btn-default">Edit Profile</a>
-    {% endif %}
-    {% if current_user.is_administrator() %}
-        <a href="{{ url_for('.admin_edit_profile', id=user.id) }}" class="btn btn-danger">
-            Edit Profile [Admin]
-        </a>
-    {% endif %}
 {% endblock %}
