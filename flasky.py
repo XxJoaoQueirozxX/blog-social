@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 
 from app import create_app, db
-from app.models import User, Role, Permission
+from app.models import User, Role, Permission, Post
 
 
 load_dotenv()
@@ -21,7 +21,7 @@ def gerar_banco():
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(db=db, User=User, Role=Role, Permission=Permission)
+    return dict(db=db, User=User, Role=Role, Permission=Permission, Post=Post)
 
 
 @app.cli.command()
