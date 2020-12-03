@@ -32,7 +32,7 @@
         {% endif %}
 
         <p>
-            Member since {{ moment(user.member_since).format('L') }}
+            Member since {{ moment(user.member_since).format('LL') }}
             Last seen {{ moment(user.last_seen).fromNow() }}
         </p>
         {% if user == current_user %}

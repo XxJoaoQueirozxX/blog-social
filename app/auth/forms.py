@@ -48,3 +48,13 @@ class PasswordResetForm(FlaskForm):
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField("Reset Password")
 
+class ChangeEmailForm(FlaskForm):
+    email = StringField('New email', validators=[
+        DataRequired(),
+        Length(1, 64),
+        Email()
+    ])
+
+    password = PasswordField('Passowrd', validators=[DataRequired()])
+
+    submit = SubmitField('Submit')

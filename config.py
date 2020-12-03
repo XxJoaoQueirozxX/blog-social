@@ -10,7 +10,7 @@ class Config:
     MAIL_PORT = int(os.getenv("MAIL_PORT", "587"))
     MAIL_USE_TLS = os.getenv("MAIL_USE_TLS", 'true').lower() in ['true', 'on', '1']
     MAIL_USERNAME = os.getenv("USER_EMAIL")
-    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
+    MAIL_PASSWORD = os.getenv("USER_PASSWORD")
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <hotel.api.flask@gmail.com>'
     FLASKY_ADMIN = os.getenv("FLASK_ADMIN")
