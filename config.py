@@ -14,6 +14,7 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <hotel.api.flask@gmail.com>'
     FLASKY_ADMIN = os.getenv("FLASK_ADMIN")
+    FLASKY_POSTS_PER_PAGE = 10
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     @staticmethod

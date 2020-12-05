@@ -6,6 +6,8 @@ from datetime import datetime
 import hashlib
 from . import db, login_manager
 
+from markdown import markdown
+import bleach
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -220,7 +222,22 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+
+    @staticmethod
+    def on_change_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote'
+                        'code' 'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul'
+                        'h1', 'h2', 'h3', 'p', 'sub', 'sup']
+
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value,output_format='html'),
+            tags=allowed_tags, strip=True
+        ))
+
+
+db.event.listen(Post.body, 'set', Post.on_change_body)
 
