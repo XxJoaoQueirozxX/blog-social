@@ -14,6 +14,13 @@ def load_user(user_id):
     return User.query.filter_by(id=int(user_id)).first()
 
 
+class Follow(db.Model):
+    __tablename__ = "follows"
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Role(db.Model):
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
@@ -79,6 +86,21 @@ class User(UserMixin, db.Model):
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy="dynamic")
 
+    followed = db.relationship(
+        "Follow",
+        foreign_keys=[Follow.follower_id],
+        backref= db.backref('follower', lazy="joined"),
+        lazy="dynamic",
+        cascade='all, delete-orphan'
+    )
+
+    followers = db.relationship(
+        "Follow",
+        foreign_keys=[Follow.followed_id],
+        backref= db.backref('followed', lazy="joined"),
+        lazy="dynamic",
+        cascade='all, delete-orphan'
+    )
 
     confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -198,6 +220,28 @@ class User(UserMixin, db.Model):
     def is_administrator(self):
         return self.role.has_permission(Permission.ADMIN)
 
+    def follow(self, user):
+        if not self.is_following(user):
+            follow = Follow(follower=self, followed=user)
+            db.session.add(follow)
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+
+    def is_following(self, user):
+        if user.id is None:
+            return False
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        if user.id is None:
+             return False
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+
+
+
 
 class AnonyomusUser(AnonymousUserMixin):
     def can(self, perm):
@@ -240,4 +284,6 @@ class Post(db.Model):
 
 
 db.event.listen(Post.body, 'set', Post.on_change_body)
+
+
 
