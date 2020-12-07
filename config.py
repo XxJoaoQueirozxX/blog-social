@@ -15,6 +15,8 @@ class Config:
     FLASKY_MAIL_SENDER = 'Flasky Admin <hotel.api.flask@gmail.com>'
     FLASKY_ADMIN = os.getenv("FLASK_ADMIN")
     FLASKY_POSTS_PER_PAGE = 10
+    FLASKY_FOLLOWERS_PER_PAGE = 20
+    FLASKY_FOLLOWED_PER_PAGE = 20
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     @staticmethod
