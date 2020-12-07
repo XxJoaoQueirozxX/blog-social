@@ -25,6 +25,9 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="/">Home</a></li>
+                    {% if current_user.can(Permission.MODERATE) %}
+                        <li><a href="{{ url_for('main.moderate') }}">Moderate Comments</a></li>
+                    {% endif %}
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
