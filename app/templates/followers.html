@@ -20,7 +20,7 @@
         </thead>
         <tbody>
             {% for follow in follows %}
-                {% if follow != user %}
+                {% if follow['user'] != user %}
 
                         <tr>
                             <td>
