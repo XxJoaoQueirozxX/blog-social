@@ -21,6 +21,7 @@ class Follow(db.Model):
 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 class Role(db.Model):
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
@@ -121,6 +122,20 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config["SECRET_KEY"], expires_in=expiration)
+        return s.dumps({"id": self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
 
     def change_email(self, token):
         s = Serializer(current_app.config["SECRET_KEY"])
