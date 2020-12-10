@@ -1,13 +1,15 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_login import UserMixin, AnonymousUserMixin
-from flask import current_app
+from flask import current_app, url_for
 from datetime import datetime
-import hashlib
-from . import db, login_manager
-
 from markdown import markdown
+import hashlib
 import bleach
+
+from . import db, login_manager
+from app.exceptions import ValidationError
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -269,6 +271,16 @@ class User(UserMixin, db.Model):
                 db.session.add(user)
                 db.session.commit()
 
+    def to_json(self):
+        return {
+            "url": url_for('api.get_user', id=self.id),
+            "username": self.username,
+            "member_since": self.member_since,
+            "last_seen": self.last_seen,
+            "post_url": url_for('api.get_user_posts', id=self.id),
+            "followed_posts_url": url_for('api.get_user_followed_posts', id=self.id)
+        }
+
 
 class AnonyomusUser(AnonymousUserMixin):
     def can(self, perm):
@@ -309,6 +321,24 @@ class Post(db.Model):
             tags=allowed_tags, strip=True
         ))
 
+    def to_json(self):
+        return {
+            "url": url_for('api.get_post', id=self.id),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author_url': url_for('api.get_user', id=self.author_id),
+            "comments_url": url_for('api.get_comments', id=self.id),
+            'comments_count': self.comments.count()
+        }
+
+    @staticmethod
+    def from_json(json_post: dict):
+        body = json_post.get('body')
+        if body is None or body == '':
+            return ValidationError("post does not have a body")
+        return Post(body=body)
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -333,6 +363,23 @@ class Comment(db.Model):
                 tags=allowed_tags,
                 strip=True
             ))
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "body": self.body,
+            "body_html": self.body_html,
+            "timestamp": self.timestamp,
+            "author_url": url_for("api.get_user", id=self.author_id),
+            "post_url": url_for('api.get_post', id=self.post_id)
+        }
+
+    @staticmethod
+    def from_json(json_comment):
+        body = json_comment.get('body')
+        if body is None or body == '':
+            return ValidationError("comment does not have a body")
+        return Comment(body=body)
 
 
 db.event.listen(Post.body, 'set', Post.on_change_body)
