@@ -1,9 +1,10 @@
 from flask import request, g, jsonify, url_for
 from .. import db
 from . import api
-from ..models import Post, Permission, Comment
+from ..models import Post, Permission
 from .decorators import permission_required
 from .errors import forbidden
+from flask import  current_app
 
 
 @api.route('/posts/', methods=['POST'])
@@ -13,15 +14,36 @@ def new_post():
     post.author = g.current_user
     db.session.add(post)
     db.session.commit()
-    return jsonify(post.to_json()), 201, {'location':url_for('api.get_post', id=post.id)}
+    return jsonify(post.to_json()), 201, {'location': url_for('api.get_post', id=post.id)}
 
 
 @api.route('/posts/')
 def get_posts():
-    posts = Post.query.all()
+    page = request.args.get('page', 1, type=int)
+    pagination = Post.query.paginate(
+        page,
+        per_page= current_app.config["FLASKY_POSTS_PER_PAGE"],
+        error_out=False
+    )
+
+    posts = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('api.get_posts', page=page-1)
+
+    next = None
+    if pagination.has_next:
+        next = url_for('api.get_posts', page=page+1)
+
     return jsonify(
         {
-            "posts": [post.to_json() for post in posts]
+            "posts": [post.to_json() for post in posts],
+            "prev_url": prev,
+            "next_url": next,
+            "count": pagination.total,
+            "pages": pagination.pages,
+            "current_page": page,
+            "items_per_page": pagination.per_page
         }
     )
 

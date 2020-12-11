@@ -275,10 +275,12 @@ class User(UserMixin, db.Model):
         return {
             "url": url_for('api.get_user', id=self.id),
             "username": self.username,
-            "member_since": self.member_since,
+            "member_since":  self.member_since,
             "last_seen": self.last_seen,
             "post_url": url_for('api.get_user_posts', id=self.id),
-            "followed_posts_url": url_for('api.get_user_followed_posts', id=self.id)
+            "followed_posts_url": url_for('api.get_user_followed_posts', id=self.id),
+            "total_comments": self.comments.count(),
+            "total_posts": self.posts.count()
         }
 
 
